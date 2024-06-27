@@ -21,7 +21,7 @@ export default function StaffCard({ staff, index }) {
 
     const renderProjectDetails = (
         <Box>
-            <Typography variant="subtitle1">
+            <Typography variant="subtitle1">  
                 {projectTitle}
             </Typography>
             <Typography variant="body2" color="textSecondary">

@@ -10,7 +10,7 @@ export default function LoginPage() {
       <Helmet>
         <title> Login | Minimal UI </title>
       </Helmet>
-
+ 
       <LoginView />
     </>
   );

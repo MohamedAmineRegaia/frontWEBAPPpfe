@@ -14,6 +14,8 @@ export const Page404 = lazy(() => import('src/pages/page-not-found'));
 export const AppView = lazy(() => import('src/pages/app'));
 export const AddUserPage = lazy(() => import('src/pages/Add-user'));
 export const StaffDetailsViewPage = lazy(()=> import('src/pages/staffDetails'));
+export const PropalePage = lazy(() => import('src/pages/propale'));
+
 
 export const PrivateRoute = ({ element, ...rest }) => {
   const { keycloak } = useKeycloak();
@@ -46,6 +48,8 @@ export default function Router() {
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
         { path: 'StaffDetailsViewPage', element: <StaffDetailsViewPage /> },
+        { path: 'PropalePage', element: <PropalePage /> },
+
 
       ],
     },

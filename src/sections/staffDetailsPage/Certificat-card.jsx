@@ -4,10 +4,14 @@ import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
+import Iconify from 'src/components/iconify/iconify';
 
-export default function CertifCard({ certif, index }) {
+
+
+export default function CertifCard({ certif, index, onDelete }) {
     const { certification } = certif;
     const cover = `/assets/images/certifications/googleCloudEng.png`;
     
@@ -21,7 +25,7 @@ export default function CertifCard({ certif, index }) {
     );
    
     
-    const renderCover = (
+    const renderCover = ( 
         <Box
             component="img"
             alt={certification}
@@ -49,6 +53,13 @@ export default function CertifCard({ certif, index }) {
                 <Box sx={{ p: 3 }}>
 
                     {renderCertifications}
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+
+                        <Iconify icon="eva:trash-2-outline"
+                            sx={{ position: 'absolute', top: 8, right: 8 }}
+                            onClick={() => onDelete(certif.id)}
+                            aria-label="delete" />
+                    </Stack>
 
                 </Box>
             </Card>
@@ -60,4 +71,6 @@ export default function CertifCard({ certif, index }) {
 CertifCard.propTypes = {
     certif: PropTypes.object.isRequired,
     index: PropTypes.number,
+    onDelete: PropTypes.func.isRequired,
+
 };

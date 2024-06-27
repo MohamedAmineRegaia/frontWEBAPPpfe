@@ -40,7 +40,7 @@ export default function getNavConfig (role)  {
   } if (role === 'STAFF') {
     return [
       {
-        title: 'StaffDetails',
+        title: 'StaffDetails', 
         path: '/StaffDetailsViewPage',
         icon: icon('ic_cart'),
       },
@@ -50,7 +50,20 @@ export default function getNavConfig (role)  {
         icon: icon('ic_blog'),
       },
     ];
-  }
+  } if (role === 'COMMERCIAL') {
+    return [
+      {
+        title: 'dashboard',
+        path: '/dashboard',
+        icon: icon('ic_analytics'),
+      },
+      {
+        title: 'propales',
+        path: '/PropalePage',
+        icon: icon('ic_user'),
+      },
+    ];
+  } 
 
   return []
 };

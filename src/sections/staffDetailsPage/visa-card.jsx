@@ -3,31 +3,27 @@ import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 import { fDate } from 'src/utils/format-time';
 
-export default function VisaCard({ visaa, index }) {
+import Iconify from 'src/components/iconify/iconify';
+
+export default function VisaCard({ visaa, index, onDelete }) {
     const { visa } = visaa;
-    console.log(visa);
 
     const currentDate = new Date();
 
-    // Vérifier si une date de visa est fournie
     let visaDate = null;
     let isExpired = false;
-    let cardBgColor = 'info.main'; // Couleur par défaut si pas de visa
+    let cardBgColor = 'info.main';
     let formattedVisaDate = 'You don\'t have a visa yet';
 
     if (visa && visa.trim() !== '') {
-        // Convertir la date de visa en objet Date
         visaDate = new Date(visa);
-
-        // Déterminer si la date est expirée
         isExpired = visaDate < currentDate;
         cardBgColor = isExpired ? 'error.main' : 'success.main';
-
-        // Formater la date du visa
         formattedVisaDate = fDate(visaDate);
     }
 
@@ -42,8 +38,17 @@ export default function VisaCard({ visaa, index }) {
     return (
         <Grid item xs={12} sm={6} md={4} sx={{ mb: 3, marginLeft: 3, marginRight: 3 }}>
             <Card sx={{ backgroundColor: cardBgColor }}>
-                <Box sx={{ p: 3 }}>
+                <Box sx={{ p: 3, position: 'relative' }}>
                     {renderVisa}
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+
+                        <Iconify icon="eva:trash-2-outline" 
+                            sx={{ position: 'absolute', top: 8, right: 8 }}
+                            onClick={() => onDelete(visaa.id)}
+                            aria-label="delete" />
+                    </Stack>
+                       
+                    
                 </Box>
             </Card>
         </Grid>
@@ -53,6 +58,8 @@ export default function VisaCard({ visaa, index }) {
 VisaCard.propTypes = {
     visaa: PropTypes.shape({
         visa: PropTypes.string,
+        id: PropTypes.number.isRequired,
     }).isRequired,
     index: PropTypes.number,
+    onDelete: PropTypes.func.isRequired,
 };

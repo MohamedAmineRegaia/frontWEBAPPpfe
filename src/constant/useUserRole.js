@@ -24,11 +24,11 @@ const useUserRole = () => {
                 })
                 .catch((error) => {
                     console.error('Failed to fetch user role:', error);
-                });
+                }); 
         }
     }, [keycloak]);
-
+ 
     return role;
-};
+}; 
 
 export default useUserRole;

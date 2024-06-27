@@ -18,7 +18,7 @@ export default function PostSearch({ posts }) {
       sx={{ width: 280 }}
       autoHighlight
       popupIcon={null}
-      slotProps={{
+      slotProps={{ 
         paper: {
           sx: {
             width: 320,

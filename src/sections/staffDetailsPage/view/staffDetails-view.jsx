@@ -28,9 +28,36 @@ export default function StaffDetailsView() {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [visaDate, setVisaDate] = useState('');
     const [certifName, setCertifName] = useState('');
-    const [selectedVisaId, setSelectedVisaId] = useState(null);
 
     const { keycloak } = useKeycloak();
+
+    const fetchCertifForadd = async () => {
+        try {
+            const response = await axios.get(`${baseURL}/Staff-Certification/affichage`, {
+                headers: {
+                    Authorization: `Bearer ${keycloak.token}`
+                }
+            });
+            setStaffCertifications(response.data);
+        } catch (error) {
+            console.error('Error fetching staff certifications:', error);
+        }
+    };
+
+    const fetchVisaforadd = async () => {
+        try {
+            const response = await axios.get(`${baseURL}/visa/affichage`, {
+                headers: {
+                    Authorization: `Bearer ${keycloak.token}`
+                }
+            });
+            setVisa(response.data);
+            console.log("aza   ")
+            console.log(response.data)
+        } catch (error) {
+            console.error('Error fetching visas:', error);
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -67,6 +94,8 @@ export default function StaffDetailsView() {
                     }
                 });
                 setVisa(response.data);
+                console.log("aza   ")
+                console.log(response.data)
             } catch (error) {
                 console.error('Error fetching visas:', error);
             }
@@ -80,7 +109,7 @@ export default function StaffDetailsView() {
     const handleAddVisa = async () => {
         try {
             const response = await axios.post(
-                'http://127.0.0.1:8085/visa/ajouter',
+                `${baseURL}/visa/ajouter`,
                 { visa: visaDate },
                 {
                     headers: {
@@ -91,6 +120,7 @@ export default function StaffDetailsView() {
             );
             setVisa([...visa, response.data]);
             setOpenVisaDialog(false);
+            fetchVisaforadd();
         } catch (error) {
             console.error('Error adding visa:', error);
         }
@@ -99,7 +129,7 @@ export default function StaffDetailsView() {
     const handleAddCertification = async () => {
         try {
             const response = await axios.post(
-                'http://127.0.0.1:8085/Staff-Certification/ajouter',
+                `${baseURL}/Staff-Certification/ajouter`,
                 { certification: certifName },
                 {
                     headers: {
@@ -109,30 +139,41 @@ export default function StaffDetailsView() {
                 }
             );
             setStaffCertifications([...staffCertifications, response.data]);
+            fetchCertifForadd();
             setOpenCertifDialog(false);
         } catch (error) {
             console.error('Error adding certification:', error);
         }
     };
 
-    const handleDeleteVisa = async () => {
+    const handleDeleteVisa = async (visaId) => {
         try {
-            await axios.delete(`http://127.0.0.1:8085/visa/supprimer/${selectedVisaId}`, {
+            await axios.delete(`${baseURL}/visa/delete/${visaId}`, {
                 headers: {
                     Authorization: `Bearer ${keycloak.token}`
                 }
             });
-            setVisa(visa.filter(v => v.id !== selectedVisaId));
-            setOpenDeleteDialog(false);
+            setVisa(visa.filter(v => v.id !== visaId));
+            fetchVisaforadd();
         } catch (error) {
             console.error('Error deleting visa:', error);
         }
     };
-
-    const handleLongPress = (visaId) => {
-        setSelectedVisaId(visaId);
-        setOpenDeleteDialog(true);
+    const handleDeleteCertif = async (certifId) => {
+        try {
+            await axios.delete(`${baseURL}/Staff-Certification/delete/${certifId}`, {
+                headers: {
+                    Authorization: `Bearer ${keycloak.token}`
+                }
+            });
+            setStaffCertifications(staffCertifications.filter(c => c.id !== certifId));
+            fetchCertifForadd();
+        } catch (error) {
+            console.error('Error deleting certif:', error);
+        }
     };
+
+    
 
     return (
         <Container>
@@ -156,7 +197,7 @@ export default function StaffDetailsView() {
                             key={v.id}
                             visaa={v}
                             index={index}
-                            onClick={() => handleLongPress(v.id)}
+                            onDelete={handleDeleteVisa}
                         />
                     ))
                 )}
@@ -171,7 +212,11 @@ export default function StaffDetailsView() {
 
             <Grid container spacing={3}>
                 {staffCertifications.map((certif, index) => (
-                    <CertifCard key={certif.id} certif={certif} index={index} />
+                    <CertifCard
+                     key={certif.id} 
+                     certif={certif} 
+                     index={index}
+                    onDelete={handleDeleteCertif} /> 
                 ))}
             </Grid>
 
