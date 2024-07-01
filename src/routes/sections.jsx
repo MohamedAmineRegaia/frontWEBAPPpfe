@@ -15,6 +15,10 @@ export const AppView = lazy(() => import('src/pages/app'));
 export const AddUserPage = lazy(() => import('src/pages/Add-user'));
 export const StaffDetailsViewPage = lazy(()=> import('src/pages/staffDetails'));
 export const PropalePage = lazy(() => import('src/pages/propale'));
+export const AddPropalePage = lazy(() => import('src/pages/addPropale'));
+export const HistoriqueList = lazy(() => import('src/pages/historique'));
+
+
 
 
 export const PrivateRoute = ({ element, ...rest }) => {
@@ -49,6 +53,10 @@ export default function Router() {
         { path: 'blog', element: <BlogPage /> },
         { path: 'StaffDetailsViewPage', element: <StaffDetailsViewPage /> },
         { path: 'PropalePage', element: <PropalePage /> },
+        { path: 'AddPropalePage', element: <AddPropalePage /> },
+        { path: 'HistoriqueList', element: <HistoriqueList /> },
+
+
 
 
       ],

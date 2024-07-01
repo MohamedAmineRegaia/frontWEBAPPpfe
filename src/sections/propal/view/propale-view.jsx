@@ -2,9 +2,14 @@ import axios from 'axios';
 import { useKeycloak } from '@react-keycloak/web';
 import React, { useState, useEffect } from 'react';
 
+import Button from '@mui/material/Button';
 import { Paper, Table, TableRow, TableBody,TableCell, TableContainer,  TablePagination } from '@mui/material';
 
+import { useRouter } from 'src/routes/hooks';
+
 import { baseURL } from 'src/constant/apiConfig';
+
+import Iconify from 'src/components/iconify';
 
 import UserTableRow from '../propale-table-row';
 import UserTableHead from '../propale-table-head';
@@ -19,6 +24,7 @@ function UserView() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const { keycloak } = useKeycloak();
+    const router = useRouter();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -61,11 +67,17 @@ function UserView() {
         comparator: getComparator(order, orderBy),
         filterName,
     });
+    const handleClickAddUser = () => {
+        router.push('/AddPropalePage');
+    };
 
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, filteredPropales.length - page * rowsPerPage);
 
     return (
         <Paper>
+            <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleClickAddUser}>
+                New propal
+            </Button>
             <UserTableToolbar filterName={filterName} onFilterName={handleFilterByName} />
             <TableContainer>
                 <Table>

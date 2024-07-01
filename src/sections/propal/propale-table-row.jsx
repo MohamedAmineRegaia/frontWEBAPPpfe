@@ -1,12 +1,18 @@
+import axios from 'axios'; // Import axios
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
+import { useKeycloak } from '@react-keycloak/web';
 
-import { Button, TableRow, TableCell,  TextField } from '@mui/material';
+import { Button, Select, MenuItem , TableRow, TableCell, TextField  } from '@mui/material';
+
+import { baseURL } from 'src/constant/apiConfig';
+
 
 function UserTableRow(props) {
     const { propale } = props;
     const [editable, setEditable] = useState(false);
     const [editedPropale, setEditedPropale] = useState(propale);
+    const { keycloak } = useKeycloak(); 
 
     const handleEditClick = () => {
         setEditable(!editable);
@@ -17,20 +23,23 @@ function UserTableRow(props) {
         setEditedPropale({ ...editedPropale, [name]: value });
     };
 
-    const handleSaveClick = () => {
-        fetch(`/propale/update/${editedPropale.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(editedPropale),
-        })
-            .then(response => response.json())
-            .then(data => {
-                setEditable(false);
-            })
-            .catch(error => console.error('Error updating data:', error));
+    
+
+    const handleSaveClick = async () => {
+        try {
+            const response = await axios.put(`${baseURL}/propale/update/${editedPropale.id}`, editedPropale, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${keycloak.token}` 
+                }
+            });
+            console.log('Data updated:', response.data);
+            setEditable(false);
+        } catch (error) {
+            console.error('Error updating data:', error);
+        }
     };
+
     const getStatusStyle = (status) => {
         switch (status) {
             case 'Won':
@@ -70,43 +79,79 @@ function UserTableRow(props) {
             </TableCell>
             <TableCell>
                 {editable ? (
-                    <TextField name="account_Type" value={editedPropale.account_Type} onChange={handleChange} fullWidth />
+                    <Select name="account_Type" value={editedPropale.account_Type} onChange={handleChange} fullWidth>
+                        {['🏆Gold', '🐟Big Fish', '🥈Silver', '✨New'].map((option) => (
+                            <MenuItem key={option} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
                 ) : (
                     propale.account_Type
                 )}
             </TableCell>
             <TableCell sx={getStatusStyle(propale.status)}>
                 {editable ? (
-                    <TextField name="status" value={editedPropale.status} onChange={handleChange} fullWidth />
+                    <Select name="status" value={editedPropale.status} onChange={handleChange} fullWidth>
+                        {['Submitted', 'Accepted', 'Dropped', 'HOLD', 'Won', 'Rebid', 'Lost (Financially)', 'Rejected (Tech. Disq)', 'WIP', 'Go/NoGo'].map((option) => (
+                            <MenuItem key={option} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
                 ) : (
                     propale.status
                 )}
             </TableCell>
             <TableCell>
                 {editable ? (
-                    <TextField name="bid_manager" value={editedPropale.bid_manager} onChange={handleChange} fullWidth />
+                    <Select name="bid_manager" value={editedPropale.bid_manager} onChange={handleChange} fullWidth>
+                        {['Amr Ramadan', 'Akram AlHossainy', 'Ahmad Kamel', 'Waleed AlAbbas', 'Tariq Khasawneh', 'Osama Alraeey', 'Osama AbdelJaber', 'Omar El Matri', 'Mohamed Taha', 'Mohamed Ragab', 'Ibrahim Abdulkareem', 'TBD', 'Tariq Khasawaneh'].map((option) => (
+                            <MenuItem key={option} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
                 ) : (
                     propale.bid_manager
                 )}
             </TableCell>
             <TableCell>
                 {editable ? (
-                    <TextField name="typeOfRequest" value={editedPropale.typeOfRequest} onChange={handleChange} fullWidth />
+                    <Select name="typeOfRequest" value={editedPropale.typeOfRequest} onChange={handleChange} fullWidth>
+                        {['RFP', 'RFI', 'RFQ', 'CR', 'Direct', 'Invitation'].map((option) => (
+                            <MenuItem key={option} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
                 ) : (
                     propale.typeOfRequest
                 )}
             </TableCell>
             <TableCell>
                 {editable ? (
-                    <TextField name="practice" value={editedPropale.practice} onChange={handleChange} fullWidth />
+                    <Select name="practice" value={editedPropale.practice} onChange={handleChange} fullWidth>
+                        {['Data Consulting', 'Data Engineering'].map((option) => (
+                            <MenuItem key={option} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
                 ) : (
                     propale.practice
                 )}
             </TableCell>
             <TableCell>
                 {editable ? (
-                    <TextField name="primaryVp" value={editedPropale.primaryVp} onChange={handleChange} fullWidth />
-                ) : (
+                    <Select name="practice" value={editedPropale.practice} onChange={handleChange} fullWidth>
+                        {['Data Strategy', 'D4B', 'Data Foundation', 'All'].map((option) => (
+                            <MenuItem key={option} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    ) : (
                     propale.primaryVp
                 )}
             </TableCell>
@@ -147,28 +192,46 @@ function UserTableRow(props) {
             </TableCell>
             <TableCell>
                 {editable ? (
-                    <TextField name="noGoReason" value={editedPropale.noGoReason} onChange={handleChange} fullWidth />
+                     <TextField
+                        select
+                        name="noGoReason"
+                        value={editedPropale.noGoReason}
+                        onChange={handleChange}
+                        fullWidth
+                    >
+                        {['Lack of Insights', 'Technical Partner insights', 'CRP Insights', 'Insufficient Budget', 'Not Aligned With VPs', 'D&I Insights (Competetors, Budget)'].map((reason) => (
+                            <MenuItem key={reason} value={reason}>
+                                {reason}
+                            </MenuItem>
+                        ))}
+                    </TextField>
                 ) : (
                     propale.noGoReason
                 )}
             </TableCell>
             <TableCell>
                 {editable ? (
-                    <TextField name="crp_CRD" value={editedPropale.crp_CRD} onChange={handleChange} fullWidth />
+                    <Select name="crp_CRD" value={editedPropale.crp_CRD} onChange={handleChange} fullWidth>
+                        {['TBD', 'Saif Almari', 'Amr Wassef', 'Aymen Qammaz', 'Osama Ghoul', 'Mohammad Aldahleh', 'Mohammed Obaldat', 'Haithem Elkhairi', 'Ahmed Al Shaikh', 'Deya AlKhatib', 'Fadi Hajar', 'Ashref Alkharouf', 'Anas AlAshraf', 'Bilal Mousa'].map((option) => (
+                            <MenuItem key={option} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
                 ) : (
                     propale.crp_CRD
                 )}
             </TableCell>
             <TableCell>
                 {editable ? (
-                    <TextField name="submissionDate" value={editedPropale.submissionDate} onChange={handleChange} fullWidth />
+                    <TextField type="date" name="submissionDate" value={editedPropale.submissionDate} onChange={handleChange} fullWidth />
                 ) : (
                     propale.submissionDate
                 )}
             </TableCell>
             <TableCell>
                 {editable ? (
-                    <TextField name="qa_deadline" value={editedPropale.qa_deadline} onChange={handleChange} fullWidth />
+                    <TextField type="date" name="qa_deadline" value={editedPropale.qa_deadline} onChange={handleChange} fullWidth />
                 ) : (
                     propale.qa_deadline
                 )}

@@ -52,15 +52,16 @@ export default function getNavConfig (role)  {
     ];
   } if (role === 'COMMERCIAL') {
     return [
-      {
-        title: 'dashboard',
-        path: '/dashboard',
-        icon: icon('ic_analytics'),
-      },
+      
       {
         title: 'propales',
         path: '/PropalePage',
         icon: icon('ic_user'),
+      },
+      {
+        title: 'Historique',
+        path: '/HistoriqueList',
+        icon: icon('ic_analytics'),
       },
     ];
   } 
