@@ -1,12 +1,16 @@
 import SvgColor from 'src/components/svg-color';
 
-// Fonction pour obtenir l'icône SVG
+// ----------------------------------------------------------------------
+
+
+
 const icon = (name) => (
   <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ width: 1, height: 1 }} />
 );
 
-// Fonction pour obtenir la configuration de navigation basée sur le rôle de l'utilisateur
-const getNavConfig = (role) => {
+export default function getNavConfig (role)  {
+
+
   if (role === 'ADMIN') {
     return [
       {
@@ -36,7 +40,7 @@ const getNavConfig = (role) => {
   } if (role === 'STAFF') {
     return [
       {
-        title: 'StaffDetails',
+        title: 'StaffDetails', 
         path: '/StaffDetailsViewPage',
         icon: icon('ic_cart'),
       },
@@ -64,9 +68,7 @@ const getNavConfig = (role) => {
         icon: icon('ic_analytics'),
       },
     ];
-  }
+  } 
 
-  return [];
+  return []
 };
-
-export default getNavConfig;
