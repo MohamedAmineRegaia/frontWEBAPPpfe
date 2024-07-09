@@ -2,15 +2,15 @@ import axios from 'axios'; // Import axios
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
-
-import { Button, Select, MenuItem, TableRow, TableCell, TextField } from '@mui/material';
-
+import { Button, Select, MenuItem, TableRow, TableCell, TextField, Stack } from '@mui/material';
+import { useRouter } from 'src/routes/hooks';
 import { baseURL } from 'src/constant/apiConfig';
 
 function UserTableRow(props) {
     const { propale, editable, onEditClick } = props;
     const [editedPropale, setEditedPropale] = useState(propale);
     const { keycloak } = useKeycloak();
+    const router = useRouter();
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -30,6 +30,10 @@ function UserTableRow(props) {
         } catch (error) {
             console.error('Error updating data:', error);
         }
+    };
+
+    const handleStaffingClick = () => {
+        router.push(`/staffing/${propale.id}`);
     };
 
     const getStatusStyle = (status) => {
@@ -123,15 +127,10 @@ function UserTableRow(props) {
             </TableCell>
             <TableCell>
                 {editable ? (
-                    <TextField type="date"
-                     name="submissionDate" value={editedPropale.submissionDate} 
-                     onChange={handleChange} fullWidth />
-
-                ): (
+                    <TextField type="date" name="submissionDate" value={editedPropale.submissionDate} onChange={handleChange} fullWidth />
+                ) : (
                     propale.submissionDate
-                    )
-
-                }
+                )}
             </TableCell>
             {editable && (
                 <>
@@ -182,12 +181,9 @@ function UserTableRow(props) {
                                 </MenuItem>
                             ))}
                         </TextField>
-
                     </TableCell>
-
                     <TableCell>
                         <TextField name="noGoDescription" label="no Go Description" value={editedPropale.noGoDescription} onChange={handleChange} multiline rows={3} fullWidth />
-
                     </TableCell>
                     <TableCell>
                         <Select name="crp_CRD" value={editedPropale.crp_CRD} onChange={handleChange} fullWidth>
@@ -198,23 +194,27 @@ function UserTableRow(props) {
                             ))}
                         </Select>
                     </TableCell>
-                    
                     <TableCell>
                         <TextField type="date" name="qa_deadline" value={editedPropale.qa_deadline} onChange={handleChange} fullWidth />
                     </TableCell>
                     <TableCell>
                         <TextField type="date" name="ReviewDate" value={editedPropale.ReviewDate} onChange={handleChange} fullWidth />
-
                     </TableCell>
-
                 </>
             )}
             <TableCell>
-                {editable ? (
-                    <Button variant="contained" color="primary" onClick={handleSaveClick}>Save</Button>
-                ) : (
-                    <Button variant="contained" color="secondary" onClick={onEditClick}>Edit</Button>
-                )}
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                    {editable ? (
+                        <Button variant="contained" color="primary" onClick={handleSaveClick}>Save</Button>
+                    ) : (
+                        <>
+                            <Button variant="contained" color="warning" onClick={onEditClick}>Edit</Button>
+                            {propale.status === 'Won' && (
+                                <Button variant="contained" color="success" onClick={handleStaffingClick} style={{ marginLeft: '8px' }}>Staffing</Button>
+                            )}
+                        </>
+                    )}
+                </Stack>
             </TableCell>
         </TableRow>
     );

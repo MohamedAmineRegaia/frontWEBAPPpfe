@@ -196,6 +196,8 @@ const AddPropaleView = () => {
                             </MenuItem>
                         ))}
                     </TextField>
+                    <TextField name="noGoDescription" label="no Go Description" value={propaleData.noGoDescription} onChange={handleChange} multiline rows={3}  fullWidth />
+
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                         <TextField
                             select
@@ -213,6 +215,8 @@ const AddPropaleView = () => {
                         </TextField>
                         <TextField type="date" name="submissionDate" label="Submission Date" value={propaleData.submissionDate} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth />
                         <TextField type="date" name="qa_deadline" label="QA Deadline" value={propaleData.qa_deadline} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth />
+                        <TextField type="date" name="ReviewDate" label="ReviewDate" value={propaleData.ReviewDate} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth />
+
                     </Stack>
                 </Stack>
 

@@ -3,7 +3,7 @@ import { useKeycloak } from '@react-keycloak/web';
 import React, { useState, useEffect } from 'react';
 
 import {
-    Paper, Table, Stack, Button, TableRow, TableBody, TableCell, TableContainer,TablePagination
+    Paper, Table, Stack, Button, TableRow, TableBody, TableCell, TableContainer, TablePagination
 } from '@mui/material';
 
 import { useRouter } from 'src/routes/hooks';
@@ -86,9 +86,9 @@ function UserView() {
             <Stack direction="row" alignItems="center" justifyContent="space-between">
                 <UserTableToolbar filterName={filterName} onFilterName={handleFilterByName} />
 
-            <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleClickAddUser}>
-                New propal
-            </Button>
+                <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleClickAddUser}>
+                    New propal
+                </Button>
 
             </Stack>
             <TableContainer>

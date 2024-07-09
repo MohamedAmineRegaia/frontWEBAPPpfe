@@ -27,8 +27,8 @@ export default function getNavConfig (role)  {
   } if (role === 'MANAGER') {
     return [
       {
-        title: 'product',
-        path: '/products',
+        title: 'propales',
+        path: '/ManagerPropale',
         icon: icon('ic_cart'),
       },
       {

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-
 import Stack from '@mui/material/Stack';
 import Select from '@mui/material/Select';
 import Dialog from '@mui/material/Dialog';
@@ -19,7 +18,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
-
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 
@@ -29,8 +27,10 @@ export default function UserTableRow({
   avatarUrl,
   email,
   realmRole,
-  autreAttribut,
+  profession,
   disponibilite,
+  date_deb_projet,
+  date_fin_projet,
   handleDeleteUser,
   handleUpdateRole,
 }) {
@@ -94,11 +94,14 @@ export default function UserTableRow({
 
         <TableCell>{realmRole}</TableCell>
 
-        <TableCell align="center">{autreAttribut}</TableCell>
+        <TableCell align="center">{profession}</TableCell>
 
         <TableCell>
           <Label color={(disponibilite === 'banned' && 'error') || 'success'}>{disponibilite}</Label>
         </TableCell>
+
+        <TableCell align="center">{date_deb_projet}</TableCell>
+        <TableCell align="center">{date_fin_projet}</TableCell>
 
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
@@ -148,7 +151,6 @@ export default function UserTableRow({
               <MenuItem value="MANAGER">Manager</MenuItem>
               <MenuItem value="COMMERCIAL">Commercial</MenuItem>
               <MenuItem value="STAFF">Staff</MenuItem>
-
             </Select>
           </FormControl>
         </DialogContent>
@@ -171,6 +173,8 @@ UserTableRow.propTypes = {
   name: PropTypes.any,
   realmRole: PropTypes.any,
   selected: PropTypes.any,
-  autreAttribut: PropTypes.string,
+  profession: PropTypes.string,
+  date_deb_projet: PropTypes.string,
+  date_fin_projet: PropTypes.string,
   handleUpdateRole: PropTypes.func,
 };

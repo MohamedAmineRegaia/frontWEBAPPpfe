@@ -13,7 +13,7 @@ function UserTableHead(props) {
     return (
         <TableHead>
             <TableRow>
-                <TableCell  sx={{ minWidth: 550, padding: '16px 24px' }} sortDirection={orderBy === 'propaleName' ? order : false}>
+                <TableCell sx={{ minWidth: 550, padding: '16px 24px' }} sortDirection={orderBy === 'propaleName' ? order : false}>
                     <TableSortLabel
                         active={orderBy === 'propaleName'}
                         direction={orderBy === 'propaleName' ? order : 'asc'}
@@ -168,7 +168,7 @@ function UserTableHead(props) {
                                 CRP/CRD
                             </TableSortLabel>
                         </TableCell>
-                        
+
                         <TableCell sortDirection={orderBy === 'qa_deadline' ? order : false}>
                             <TableSortLabel
                                 active={orderBy === 'qa_deadline'}

@@ -214,12 +214,13 @@ export default function UserPage() {
                 onSelectAllClick={handleSelectAllClick}
                 headLabel={[
                   { id: 'name', label: 'Name' },
-                  { id: 'email', label: 'email' },
-                  { id: 'realmRole', label: 'role' },
-                  { id: 'autreAttribut', label: 'autreAttribut', align: 'center' },
-                  { id: 'disponibilite', label: 'disponibilite' },
-
-                  { id: '' },
+                  { id: 'email', label: 'Email' },
+                  { id: 'realmRole', label: 'Role' },
+                  { id: 'profession', label: 'Profession', align: 'center' },
+                  { id: 'disponibilite', label: 'Disponibilité' },
+                  { id: 'date_deb_projet', label: 'Date de début du projet', align: 'center' },
+                  { id: 'date_fin_projet', label: 'Date de fin du projet', align: 'center' },
+                  { id: '', label: '', align: 'right' },
                 ]}
               />
               <TableBody>
@@ -232,7 +233,10 @@ export default function UserPage() {
                       
                       email={user.email}
                       disponibilite={user.attributes && user.attributes.disponibilite}
-                      autreAttribut={user.attributes && user.attributes.autreAttribut}
+                      profession={user.attributes && user.attributes.profession}
+                      date_deb_projet={user.attributes && user.attributes.date_deb_projet}
+                      date_fin_projet={user.attributes && user.attributes.date_fin_projet}
+
                       realmRole={user.realmRoles && user.realmRoles.join(', ')}
                       selected={selected.indexOf(user.username) !== -1}
                       handleClick={(event) => handleClick(event, user.username)}

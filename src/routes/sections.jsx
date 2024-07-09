@@ -17,6 +17,10 @@ export const StaffDetailsViewPage = lazy(()=> import('src/pages/staffDetails'));
 export const PropalePage = lazy(() => import('src/pages/propale'));
 export const AddPropalePage = lazy(() => import('src/pages/addPropale'));
 export const HistoriqueList = lazy(() => import('src/pages/historique'));
+export const ManagerPropale = lazy(() => import('src/pages/propaleManager') )
+export const StaffingViewPage = lazy(() => import('src/pages/StaffingPage'))
+
+
 
 
 
@@ -55,6 +59,10 @@ export default function Router() {
         { path: 'PropalePage', element: <PropalePage /> },
         { path: 'AddPropalePage', element: <AddPropalePage /> },
         { path: 'HistoriqueList', element: <HistoriqueList /> },
+        { path: 'ManagerPropale', element: <ManagerPropale /> },
+        { path: '/staffing/:id', element: <StaffingViewPage /> },
+
+
 
 
 
