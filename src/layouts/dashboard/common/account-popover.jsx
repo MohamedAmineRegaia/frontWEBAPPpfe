@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
+import { useRouter } from 'src/routes/hooks';
+
 
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -34,6 +36,8 @@ const MENU_OPTIONS = [
 export default function AccountPopover() {
   const [open, setOpen] = useState(null);
   const { keycloak } = useKeycloak();
+  const router = useRouter();
+
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -44,8 +48,10 @@ export default function AccountPopover() {
   };
 
   const handleLogout = () => {
+    router.push('/dashboard');
     localStorage.clear();
     keycloak.logout();
+   
     handleClose();
   };
 

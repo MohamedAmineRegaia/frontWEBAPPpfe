@@ -2,16 +2,22 @@ import axios from 'axios';
 import { useKeycloak } from '@react-keycloak/web';
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import SockJS from 'sockjs-client';
+import { Client } from '@stomp/stompjs';
 import {
-    Paper, Table, TableRow, TableCell,
-     TableContainer, Typography, CircularProgress, 
-     TableHead, TableBody, Button, TextField, MenuItem, Dialog, 
-     DialogActions, DialogContent, DialogContentText, 
-     DialogTitle, useMediaQuery, useTheme,Grid
+    Paper, Table, TableRow, TableCell, Button, Dialog, MenuItem, useTheme,
+    TableContainer, TableHead, TableBody, Grid, TextField, Typography,Box,
+      
+    DialogTitle, DialogActions, useMediaQuery, DialogContent, CircularProgress, DialogContentText
+    
+    
 } from '@mui/material';
+
 import { baseURL } from 'src/constant/apiConfig';
 
 function StaffingPage() {
+
+
     const { id } = useParams();
     const { keycloak } = useKeycloak();
     const [propale, setPropale] = useState(null);
@@ -23,12 +29,16 @@ function StaffingPage() {
     const [userToUnassign, setUserToUnassign] = useState(null);
     const [staffCertifications, setStaffCertifications] = useState([]);
     const [StaffVisa, setStaffVisa] = useState([]);
+    const [projectToUnassign, setProjectToUnassign] = useState('');
+
 
 
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
 
+
+   
 
     useEffect(() => {
         const fetchPropale = async () => {
@@ -95,14 +105,16 @@ function StaffingPage() {
                 }
             });
             setPropale(response.data);
+            console.log(response.data);
             setSelectedUser('');
         } catch (error) {
             console.error('Error assigning user:', error);
         }
     };
 
-    const handleUnassignUser = (userId) => {
+    const handleUnassignUser = (userId, projectTitle) => {
         setUserToUnassign(userId);
+        setProjectToUnassign(projectTitle);
         setConfirmOpen(true);
     };
 
@@ -113,6 +125,17 @@ function StaffingPage() {
                     Authorization: `Bearer ${keycloak.token}`
                 }
             });
+            await axios.delete(`${baseURL}/Staff-Projet/delete`, {
+                params: {
+                    userId: userToUnassign,
+                    projectTitle: projectToUnassign
+                },
+                headers: {
+                    Authorization: `Bearer ${keycloak.token}`
+                }
+            });
+            
+
             // Re-fetch propale to update the list of assigned users
             const response = await axios.get(`${baseURL}/propale/${id}`, {
                 headers: {
@@ -202,36 +225,30 @@ function StaffingPage() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell><strong>Field</strong></TableCell>
-                            <TableCell><strong>Value</strong></TableCell>
-                            <TableCell><strong>Field</strong></TableCell>
-                            <TableCell><strong>Value</strong></TableCell>
-                            <TableCell><strong>Field</strong></TableCell>
-                            <TableCell><strong>Value</strong></TableCell>
+                            <TableCell><strong>Nom de Propale</strong></TableCell>
+                            <TableCell><strong>Organisation</strong></TableCell>
+                            <TableCell><strong>Type de Compte</strong></TableCell>
+                            <TableCell><strong>Statut</strong></TableCell>
+                            <TableCell><strong>Bid Manager</strong></TableCell>
+                            <TableCell><strong>Practice</strong></TableCell>
+                            <TableCell>Date de Soumission</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         <TableRow>
-                            <TableCell>Nom de Propale</TableCell>
+                            
                             <TableCell>{propale.propaleName}</TableCell>
-                            <TableCell>Organisation</TableCell>
-                            <TableCell>{propale.companyOrg}</TableCell>
-                            <TableCell>Type de Compte</TableCell>
-                            <TableCell>{propale.accountType}</TableCell>
+                            <TableCell>{propale.company_org}</TableCell>
+                            <TableCell>{propale.account_Type}</TableCell>
+                            <TableCell>{propale.status}</TableCell>
+                            <TableCell>{propale.bid_manager}</TableCell>
+                            <TableCell>{propale.practice}</TableCell>
+                            <TableCell>{new Date(propale.submissionDate).toLocaleDateString()}</TableCell>
+
+
                         </TableRow>
 
-                        <TableRow>
-                            <TableCell>Statut</TableCell>
-                            <TableCell>{propale.status}</TableCell>
-                            <TableCell>Bid Manager</TableCell>
-                            <TableCell>{propale.bidManager}</TableCell>
-                            <TableCell>Practice</TableCell>
-                            <TableCell>{propale.practice}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>Date de Soumission</TableCell>
-                            <TableCell>{new Date(propale.submissionDate).toLocaleDateString()}</TableCell>
-                        </TableRow>
+                        
                         {/* Ajoutez d'autres Fields ici si nécessaire */}
                     </TableBody>
                 </Table>
@@ -255,7 +272,7 @@ function StaffingPage() {
                                 <TableCell>{assignment.username}</TableCell>
                                 <TableCell>{new Date(assignment.assignmentDate).toLocaleDateString()}</TableCell>
                                 <TableCell>
-                                    <Button variant="contained" color="warning" onClick={() => handleUnassignUser(assignment.userId)}>
+                                    <Button variant="contained" color="warning" onClick={() => handleUnassignUser(assignment.userId, propale.propaleName)}>
                                         Désassigner
                                     </Button>
                                 </TableCell>
@@ -314,7 +331,20 @@ function StaffingPage() {
                                 <DialogContentText color="black"> <strong>Visa end date:</strong>  {StaffVisa.map(visa => visa.visa).join(', ')}</DialogContentText>
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <DialogContentText color="black">  <strong> availability:</strong>  {userDetails.attributes?.disponibilite?.[0]}</DialogContentText>
+                                <DialogContentText color="black">
+                                    <Box
+                                        component="span"
+                                        sx={{
+                                            display: 'inline-block',
+                                            width: 12,
+                                            height: 12,
+                                            borderRadius: '50%',
+                                            backgroundColor: userDetails.attributes?.disponibilite?.[0]?.toLowerCase() === 'available' || userDetails.attributes?.disponibilite?.[0]?.toLowerCase() === 'disponible' ? 'green' : 'red',
+                                            marginRight: 1,
+                                        }}
+                                    />
+                                    <strong>availability:</strong> {userDetails.attributes?.disponibilite?.[0]}
+                                </DialogContentText>
                             </Grid>
                              <Grid item xs={12} sm={6}>
                                 <DialogContentText color="black">  <strong>Project end date:</strong>   {formatDate(userDetails.attributes?.date_fin_projet?.[0])}</DialogContentText>

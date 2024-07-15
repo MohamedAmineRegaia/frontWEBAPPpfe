@@ -29,6 +29,7 @@
     "@mui/styles": "^5.15.21",
     "@mui/x-date-pickers": "^7.7.1",
     "@react-keycloak/web": "^3.4.0",
+    "@stomp/stompjs": "^7.0.0",
     "apexcharts": "^3.43.0",
     "axios": "^1.7.2",
     "date-fns": "^3.6.0",
@@ -46,7 +47,8 @@
     "react-keycloak": "^7.0.1-191016",
     "react-router-dom": "^6.16.0",
     "save": "^2.9.0",
-    "simplebar-react": "^3.2.4"
+    "simplebar-react": "^3.2.4",
+    "sockjs-client": "^1.6.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react-swc": "^3.4.0",

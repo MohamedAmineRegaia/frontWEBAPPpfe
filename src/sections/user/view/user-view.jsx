@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useState , useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
 
 import Card from '@mui/material/Card';
@@ -24,30 +24,23 @@ import UserTableRow from '../user-table-row';
 import UserTableHead from '../user-table-head';
 import TableEmptyRows from '../table-empty-rows';
 import UserTableToolbar from '../user-table-toolbar';
-import { emptyRows, applyFilter, getComparator } from '../utils';
+import {  applyFilter } from '../utils';
 
 // ----------------------------------------------------------------------
 
 export default function UserPage() {
   const [page, setPage] = useState(0);
-
   const [order, setOrder] = useState('asc');
-
   const [selected, setSelected] = useState([]);
-
   const [orderBy, setOrderBy] = useState('name');
-
   const [filterName, setFilterName] = useState('');
-
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [userData, setUserData] = useState([]);
 
   const { keycloak } = useKeycloak();
   const router = useRouter();
 
-
-  async function fetchData1() {
-
+  const fetchData = useCallback(async () => {
     try {
       const response = await axios.get(`${baseURL}/users/all`, {
         headers: {
@@ -56,15 +49,19 @@ export default function UserPage() {
       });
       console.log('Data:', response.data);
       setUserData(response.data);
-      // Utilisez les données de la réponse pour mettre à jour votre état ou effectuer d'autres actions nécessaires.
     } catch (error) {
       console.error('Error fetching data:', error);
     }
-  }
+  }, [keycloak.token]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleClickAddUser = () => {
     router.push('/adduser');
   };
+
   const handleDeleteUser = async (userId) => {
     try {
       await axios.delete(`${baseURL}/users/${userId}`, {
@@ -72,13 +69,11 @@ export default function UserPage() {
           Authorization: `Bearer ${keycloak.token}`
         }
       });
-      // Rechargez les données après la suppression de l'utilisateur
-      fetchData1();
+      fetchData();
     } catch (error) {
       console.error('Error deleting user:', error);
     }
   };
-
 
   const handleUpdateRole = async (userId, newRole) => {
     try {
@@ -92,38 +87,11 @@ export default function UserPage() {
           },
         }
       );
-      fetchData1();
+      fetchData();
     } catch (error) {
       console.error('Error updating role:', error);
     }
   };
-  
-
-  useEffect( () => {
-    
-    async function fetchData() {
-
-      try {
-        const response = await axios.get(`${baseURL}/users/all`, {
-          headers: {
-            Authorization: `Bearer ${keycloak.token}`
-          }
-        });
-        console.log('Data:', response.data);
-        
-
-        setUserData(response.data);
-        // Utilisez les données de la réponse pour mettre à jour votre état ou effectuer d'autres actions nécessaires.
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    }
-    fetchData();
-   
-  }, [keycloak.token]); 
-  
-
-
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
@@ -176,7 +144,6 @@ export default function UserPage() {
 
   const dataFiltered = applyFilter({
     inputData: userData,
-    comparator: getComparator(order, orderBy),
     filterName,
   });
 
@@ -185,11 +152,7 @@ export default function UserPage() {
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Users
-        
-        
-        </Typography>
-
+        <Typography variant="h4">Users</Typography>
         <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleClickAddUser}>
           New User
         </Button>
@@ -218,43 +181,29 @@ export default function UserPage() {
                   { id: 'realmRole', label: 'Role' },
                   { id: 'profession', label: 'Profession', align: 'center' },
                   { id: 'disponibilite', label: 'Disponibilité' },
-                  { id: 'date_deb_projet', label: 'Date de début du projet', align: 'center' },
-                  { id: 'date_fin_projet', label: 'Date de fin du projet', align: 'center' },
                   { id: '', label: '', align: 'right' },
                 ]}
               />
               <TableBody>
-                {userData
+                {dataFiltered
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((user) => (
                     <UserTableRow
                       key={user.id}
                       name={`${user.firstName} ${user.lastName}`}
-                      
                       email={user.email}
                       disponibilite={user.attributes && user.attributes.disponibilite}
                       profession={user.attributes && user.attributes.profession}
                       date_deb_projet={user.attributes && user.attributes.date_deb_projet}
                       date_fin_projet={user.attributes && user.attributes.date_fin_projet}
-
                       realmRole={user.realmRoles && user.realmRoles.join(', ')}
                       selected={selected.indexOf(user.username) !== -1}
                       handleClick={(event) => handleClick(event, user.username)}
-                      handleDeleteUser={() => handleDeleteUser(user.id)} 
+                      handleDeleteUser={() => handleDeleteUser(user.id)}
                       handleUpdateRole={(newRole) => handleUpdateRole(user.id, newRole)}
-                      
-                      />
-                    
-                    
+                    />
                   ))}
-
-
-                <TableEmptyRows
-                  height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, userData.length)}
-                />
-
-                {notFound && <TableNoData query={filterName} />}
+              
               </TableBody>
             </Table>
           </TableContainer>

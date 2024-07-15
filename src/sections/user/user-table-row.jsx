@@ -29,8 +29,6 @@ export default function UserTableRow({
   realmRole,
   profession,
   disponibilite,
-  date_deb_projet,
-  date_fin_projet,
   handleDeleteUser,
   handleUpdateRole,
 }) {
@@ -100,8 +98,7 @@ export default function UserTableRow({
           <Label color={(disponibilite === 'banned' && 'error') || 'success'}>{disponibilite}</Label>
         </TableCell>
 
-        <TableCell align="center">{date_deb_projet}</TableCell>
-        <TableCell align="center">{date_fin_projet}</TableCell>
+   
 
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
@@ -174,7 +171,5 @@ UserTableRow.propTypes = {
   realmRole: PropTypes.any,
   selected: PropTypes.any,
   profession: PropTypes.string,
-  date_deb_projet: PropTypes.string,
-  date_fin_projet: PropTypes.string,
   handleUpdateRole: PropTypes.func,
 };

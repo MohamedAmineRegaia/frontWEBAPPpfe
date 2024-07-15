@@ -15,15 +15,29 @@ import DialogContent from '@mui/material/DialogContent';
 
 import { baseURL } from 'src/constant/apiConfig';
 
+
+
+
+const generateRandomPassword = (length = 12) => {
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let password = '';
+    for (let i = 0; i < length; i+= 1) {
+        const randomIndex = Math.floor(Math.random() * charset.length);
+        password += charset[randomIndex];
+    }
+    return password;
+};
+
+
 const AddUserView = () => {
     const [userData, setUserData] = useState({
         username: '',
         email: '',
         firstName: '',
         lastName: '',
-        password: '',
+        password: generateRandomPassword(),
         disponibilite: '',
-        autreAttribut: ''
+        profession: ''
     });
 
     const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
@@ -53,7 +67,7 @@ const AddUserView = () => {
                 }
             });
              console.log (response.data)
-            if (response.data === "user add succesfully") {
+            if (response.data === "user add successfully") {
                 setResultMessage('User added successfully');
             } else {
                 setResultMessage('Error adding user');
@@ -101,12 +115,22 @@ const AddUserView = () => {
                                 </MenuItem>
                             ))}
                         </TextField>
-                        <TextField name="autreAttribut" label="Autre attribué" value={userData.autreAttribut} onChange={handleChange} fullWidth />
+                        <TextField
+                            select
+                            name="profession"
+                            label="Job"
+                            value={userData.profession}
+                            onChange={handleChange}
+                            fullWidth
+                        >
+                            {['Data Engineer ', 'data scientist','data consultant'].map((profession) => (
+                                <MenuItem key={profession} value={profession}>
+                                    {profession}
+                                </MenuItem>
+                            ))}
+                        </TextField>
                     </Stack>
-                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-
-                        <TextField name="password" label="Mot de passe" type="password" value={userData.password} onChange={handleChange} fullWidth />
-                    </Stack>
+              
                 </Stack>
                 
                 <Divider sx={{ my: 3 }} />

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import PropTypes from 'prop-types';
-import { useState,useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
 
 import Box from '@mui/material/Box';
@@ -18,63 +18,63 @@ import { useResponsive } from 'src/hooks/use-responsive';
 
 import { account } from 'src/_mock/account';
 import { baseURL } from 'src/constant/apiConfig';
-import useUserRole from 'src/constant/useUserRole';
 
 import Logo from 'src/components/logo';
 import Scrollbar from 'src/components/scrollbar';
+import getNavConfig from './config-navigation';
 
 import { NAV } from './config-layout';
-import getNavConfig from './config-navigation';
 
 // ----------------------------------------------------------------------
 
 export default function Nav({ openNav, onCloseNav }) {
     const pathname = usePathname();
     const upLg = useResponsive('up', 'lg');
-    const role = useUserRole();
-    const navConfig = getNavConfig(role);
-    const role1 = localStorage.getItem('userRole');
-    const navConfig1 = getNavConfig(role1);
     const { keycloak } = useKeycloak();
-    const [FirstName, setFirstName] = useState([]);
-    const [LastName, setLastName] = useState([]);
+    const [navConfig, setNavConfig] = useState([]);
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
 
-
-
-
+    const fetchUserData = useCallback(async () => {
+        try {
+            const response = await axios.get(`${baseURL}/users`, {
+                headers: {
+                    Authorization: `Bearer ${keycloak.token}`
+                }
+            });
+            const response1 = axios.get(`${baseURL}/users/user-role`, {
+                    headers: {
+                        Authorization: `Bearer ${keycloak.token}`,
+                    },
+                })
+                .then((resp) => {
+                   
+                    console.log(resp.data)
+                    const userRole = resp.data;
+                    const newNavConfig = getNavConfig(userRole);
+                    setNavConfig(newNavConfig);
+                })
+                .catch((error) => {
+                    console.error('Failed to fetch user role:', error);
+                }); 
+            setFirstName(response.data.firstName);
+            setLastName(response.data.lastName);
+             
+            
+        } catch (error) {
+            console.error('Error fetching user details:', error);
+        }
+    }, [keycloak.token]);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get(`${baseURL}/users`, {
-                    headers: {
-                        Authorization: `Bearer ${keycloak.token}`
-                    }
-                });
-                setFirstName(response.data.firstName)
-                setLastName(response.data.lastName)
-                
-            } catch (error) {
-                console.error('Error fetching staff details:', error);
-            }
-        };
-        fetchData();
+        if (keycloak.token) {
+            fetchUserData();
+        }
+
         if (openNav) {
             onCloseNav();
         }
-    }, [pathname, openNav, onCloseNav,keycloak.token]);
-
-    if (!role) {
-        
-      console.log(localStorage.getItem('userRole')) 
-      
-      
-    } 
-
-    if (!Array.isArray(navConfig)) {
-        console.error("navConfig is not an array:", navConfig);
-        return <div>Error: navConfig is not an array</div>; 
-    }
+    }, [pathname, openNav, onCloseNav, keycloak.token, fetchUserData]);
 
     const renderAccount = (
         <Box
@@ -91,7 +91,7 @@ export default function Nav({ openNav, onCloseNav }) {
         >
             <Avatar src={account.photoURL} alt="photoURL" />
             <Box sx={{ ml: 2 }}>
-                <Typography variant="subtitle2">{FirstName} {LastName}</Typography>
+                <Typography variant="subtitle2">{firstName} {lastName}</Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     {account.role}
                 </Typography>
@@ -99,22 +99,14 @@ export default function Nav({ openNav, onCloseNav }) {
         </Box>
     );
 
-  const renderMenu = (
-    <Stack component="nav" spacing={0.5} sx={{ px: 2 }}>
-      {navConfig.length > 0 ? (
-        navConfig.map((item) => (
-          <NavItem key={item.title} item={item} />
-        ))
-      ) : (
-        navConfig1.map((item) => (
-          <NavItem key={item.title} item={item} />
-        ))
-      )}
-    </Stack>
-  );
+    const renderMenu = (
+        <Stack component="nav" spacing={0.5} sx={{ px: 2 }}>
+            {navConfig.map((item) => (
+                <NavItem key={item.title} item={item} />
+            ))}
+        </Stack>
+    );
 
-
-    
     const renderContent = (
         <Scrollbar
             sx={{

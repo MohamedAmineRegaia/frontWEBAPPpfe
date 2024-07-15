@@ -1,5 +1,5 @@
-
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
 import { faker } from '@faker-js/faker';
 import { useKeycloak } from '@react-keycloak/web';
 
@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 
 import Iconify from 'src/components/iconify';
 
+import { baseURL } from 'src/constant/apiConfig';
 import AppTasks from '../app-tasks';
 import AppNewsUpdate from '../app-news-update';
 import AppOrderTimeline from '../app-order-timeline';
@@ -21,47 +22,36 @@ import AppConversionRates from '../app-conversion-rates';
 
 
 // ----------------------------------------------------------------------
-// Configuration Keycloak
-/*
-const keycloakConfig = {
-  url: 'http://localhost:8080/',
-  realm: 'testrealm',
-  clientId: 'authentificationClientId',
-};
-const kc = new Keycloak(keycloakConfig);
-*/
+
 export default function AppView() {
   const { keycloak } = useKeycloak();
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
 
- 
-  // Fonction pour supprimer le token du localStorage
- 
-
-
-/*
+  const fetchUserData = useCallback(async () => {
+    try {
+      const response = await axios.get(`${baseURL}/users`, {
+        headers: {
+          Authorization: `Bearer ${keycloak.token}`
+        }
+      });
+      setFirstName(response.data.firstName);
+      setLastName(response.data.lastName);
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+    }
+  }, [keycloak.token]);
 
   useEffect(() => {
-    kc.init({ onLoad: 'login-required' }).then((authenticated) => {
-      if (authenticated) {
-        console.log('Authenticated');
-        console.log('Access Token:', kc.token);
-        storeToken(kc.token); // Stockage du token lors de la connexion
-
-        axios.defaults.headers.common.Authorization = `Bearer ${kc.token}`;
-      } else {
-        console.error('Authentication failed');
-      }
-    });
-  }, []);
-
-  */
- 
+    if (keycloak.token) {
+      fetchUserData();
+    }
+  }, [keycloak.token, fetchUserData]);
 
   return (
     <Container maxWidth="xl">
       <Typography variant="h4" sx={{ mb: 5 }}>
-        Hi, Welcome back 👋
-        <p>{keycloak.token}</p>
+        Hi, Welcome back 👋 {firstName} {lastName}
       </Typography>
 
       <Grid container spacing={3}>

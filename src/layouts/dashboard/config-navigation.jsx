@@ -1,16 +1,13 @@
+// config-navigation.js
 import SvgColor from 'src/components/svg-color';
 
 // ----------------------------------------------------------------------
-
-
 
 const icon = (name) => (
   <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ width: 1, height: 1 }} />
 );
 
-export default function getNavConfig (role)  {
-
-
+export default function getNavConfig(role) {
   if (role === 'ADMIN') {
     return [
       {
@@ -24,7 +21,8 @@ export default function getNavConfig (role)  {
         icon: icon('ic_user'),
       },
     ];
-  } if (role === 'MANAGER') {
+  }
+  if (role === 'MANAGER') {
     return [
       {
         title: 'propales',
@@ -32,15 +30,21 @@ export default function getNavConfig (role)  {
         icon: icon('ic_cart'),
       },
       {
+        title: 'Historique',
+        path: '/HistoriqueList',
+        icon: icon('ic_analytics'),
+      },
+      {
         title: 'blog',
         path: '/blog',
         icon: icon('ic_blog'),
       },
     ];
-  } if (role === 'STAFF') {
+  }
+  if (role === 'STAFF') {
     return [
       {
-        title: 'StaffDetails', 
+        title: 'StaffDetails',
         path: '/StaffDetailsViewPage',
         icon: icon('ic_cart'),
       },
@@ -50,7 +54,8 @@ export default function getNavConfig (role)  {
         icon: icon('ic_blog'),
       },
     ];
-  } if (role === 'COMMERCIAL') {
+  }
+  if (role === 'COMMERCIAL') {
     return [
       {
         title: 'dashboard',
@@ -68,7 +73,7 @@ export default function getNavConfig (role)  {
         icon: icon('ic_analytics'),
       },
     ];
-  } 
+  }
 
-  return []
-};
+  return [];
+}

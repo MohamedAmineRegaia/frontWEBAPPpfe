@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
+import { connect, disconnect } from 'src/constant/WebSocket';
 
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
@@ -28,8 +29,23 @@ export default function StaffDetailsView() {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [visaDate, setVisaDate] = useState('');
     const [certifName, setCertifName] = useState('');
+    const [certifImage, setCertifImage] = useState(null);
 
     const { keycloak } = useKeycloak();
+    const [notifications, setNotifications] = useState([]);
+
+    useEffect(() => {
+        if (keycloak.token) {
+            connect(keycloak.token, (message) => {
+                setNotifications((prevNotifications) => [...prevNotifications, message]);
+                console.log('Notification received:', message);
+            });
+        }
+
+        return () => {
+            disconnect();
+        };
+    }, [keycloak.token]);
 
     const fetchCertifForadd = async () => {
         try {
@@ -101,10 +117,12 @@ export default function StaffDetailsView() {
             }
         };
 
+        console.log(notifications);
+
         fetchVisa();
         fetchData();
         fetchData1();
-    }, [keycloak]);
+    }, [keycloak, notifications]);
 
     const handleAddVisa = async () => {
         try {
@@ -127,17 +145,20 @@ export default function StaffDetailsView() {
     };
 
     const handleAddCertification = async () => {
+        const formData = new FormData();
+        formData.append('userId', keycloak.tokenParsed.sub);
+        formData.append('certification', certifName);
+        if (certifImage) {
+            formData.append('image', certifImage);
+        }
+
         try {
-            const response = await axios.post(
-                `${baseURL}/Staff-Certification/ajouter`,
-                { certification: certifName },
-                {
-                    headers: {
-                        Authorization: `Bearer ${keycloak.token}`,
-                        'Content-Type': 'application/json'
-                    }
+            const response = await axios.post(`${baseURL}/Staff-Certification/ajouter`, formData, {
+                headers: {
+                    Authorization: `Bearer ${keycloak.token}`,
+                    'Content-Type': 'multipart/form-data'
                 }
-            );
+            });
             setStaffCertifications([...staffCertifications, response.data]);
             fetchCertifForadd();
             setOpenCertifDialog(false);
@@ -159,6 +180,7 @@ export default function StaffDetailsView() {
             console.error('Error deleting visa:', error);
         }
     };
+
     const handleDeleteCertif = async (certifId) => {
         try {
             await axios.delete(`${baseURL}/Staff-Certification/delete/${certifId}`, {
@@ -169,11 +191,9 @@ export default function StaffDetailsView() {
             setStaffCertifications(staffCertifications.filter(c => c.id !== certifId));
             fetchCertifForadd();
         } catch (error) {
-            console.error('Error deleting certif:', error);
+            console.error('Error deleting certification:', error);
         }
     };
-
-    
 
     return (
         <Container>
@@ -188,7 +208,7 @@ export default function StaffDetailsView() {
                 {visa.length === 0 ? (
                     <Grid item xs={12}>
                         <Typography variant="subtitle2" align='center'>
-                            You don t have a visa yet
+                            You dont have a visa yet
                         </Typography>
                     </Grid>
                 ) : (
@@ -213,10 +233,10 @@ export default function StaffDetailsView() {
             <Grid container spacing={3}>
                 {staffCertifications.map((certif, index) => (
                     <CertifCard
-                     key={certif.id} 
-                     certif={certif} 
-                     index={index}
-                    onDelete={handleDeleteCertif} /> 
+                        key={certif.id}
+                        certif={certif}
+                        index={index}
+                        onDelete={handleDeleteCertif} />
                 ))}
             </Grid>
 
@@ -264,6 +284,11 @@ export default function StaffDetailsView() {
                         value={certifName}
                         onChange={(e) => setCertifName(e.target.value)}
                     />
+                    <TextField
+                        type="file"
+                        fullWidth
+                        onChange={(e) => setCertifImage(e.target.files[0])}
+                    />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenCertifDialog(false)}>Cancel</Button>
@@ -281,6 +306,13 @@ export default function StaffDetailsView() {
                     <Button onClick={handleDeleteVisa}>Delete</Button>
                 </DialogActions>
             </Dialog>
+
+            <div>
+                <Typography variant="h6">Notifications</Typography>
+                {notifications.map((notification, index) => (
+                    <Typography key={index}>{notification}</Typography>
+                ))}
+            </div>
         </Container>
     );
 }
